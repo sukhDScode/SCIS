@@ -10,7 +10,6 @@ if not firebase_admin._apps:
         key_dict = json.loads(st.secrets["firebase"]["service_account_key"])
         cred = credentials.Certificate(key_dict)
     except Exception:
-        # Fallback for local development
         cred = credentials.Certificate("serviceAccountKey.json")
     firebase_admin.initialize_app(cred)
 
@@ -32,6 +31,31 @@ def save_login(username: str, email: str = ""):
         print(f"[Firebase] OK  Login saved for: {username}")
     except Exception as e:
         print(f"[Firebase] ERR save_login failed: {e}")
+
+
+def save_logout(username: str):
+    try:
+        db.collection("activity_log").add({
+            "username":  username,
+            "action":    "logout",
+            "timestamp": datetime.utcnow(),
+        })
+        print(f"[Firebase] OK  Logout saved for: {username}")
+    except Exception as e:
+        print(f"[Firebase] ERR save_logout failed: {e}")
+
+
+def save_module_visit(username: str, module_name: str):
+    try:
+        db.collection("activity_log").add({
+            "username":    username,
+            "action":      "module_visit",
+            "module_name": module_name,
+            "timestamp":   datetime.utcnow(),
+        })
+        print(f"[Firebase] OK  Module visit saved: {module_name} for {username}")
+    except Exception as e:
+        print(f"[Firebase] ERR save_module_visit failed: {e}")
 
 
 def save_placement_prediction(username: str, inputs: dict,
@@ -85,7 +109,6 @@ def save_resume_analysis(username: str, job_role: str, score: float,
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  FETCH FUNCTIONS
-#  Sorting done in Python — avoids needing Firestore composite indexes.
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _sort(docs: list, limit: int) -> list:
@@ -141,7 +164,9 @@ def fetch_student_summary(username: str) -> dict:
     predictions = fetch_placement_history(username, limit=100)
     resumes     = fetch_resume_history(username, limit=100)
     return {
-        "total_logins":          len(logins),
+        "total_logins":          len([x for x in logins if x.get("action") == "login"]),
+        "total_logouts":         len([x for x in logins if x.get("action") == "logout"]),
+        "total_module_visits":   len([x for x in logins if x.get("action") == "module_visit"]),
         "total_predictions":     len(predictions),
         "total_resume_analyses": len(resumes),
         "last_prediction":       predictions[0] if predictions else None,
