@@ -10,6 +10,8 @@ FIREBASE_ERROR = ""
 try:
     from firebase_helpers import (
         save_login,
+        save_logout,
+        save_module_visit,
         save_placement_prediction,
         save_recommendation,
         save_resume_analysis,
@@ -946,6 +948,8 @@ def show_dashboard():
         """, unsafe_allow_html=True)
         if st.button("Open Module 01", key="btn_career",
                      help="Click to open Career Prediction"):
+            if FIREBASE_ON and st.session_state.username:
+                save_module_visit(st.session_state.username, "Career Prediction")
             st.session_state.stage = "career_prediction"
             st.rerun()
 
@@ -986,6 +990,8 @@ def show_dashboard():
         """, unsafe_allow_html=True)
         if st.button("Open Module 02", key="btn_improve",
                      help="Click to open Improvement Recommendations"):
+            if FIREBASE_ON and st.session_state.username:
+                save_module_visit(st.session_state.username, "Improvement Recommendations")
             st.session_state.stage = "improvement_recommendations"
             st.rerun()
 
@@ -1025,6 +1031,8 @@ def show_dashboard():
         </div>
         """, unsafe_allow_html=True)
         if st.button("Open Module 03", key="mod3_btn", help="Click to open Resume Analysis"):
+            if FIREBASE_ON and st.session_state.username:
+                save_module_visit(st.session_state.username, "Resume Analysis")
             st.session_state.stage = "resume_analysis"
             st.rerun()
 
@@ -1064,6 +1072,8 @@ def show_dashboard():
         </div>
         """, unsafe_allow_html=True)
         if st.button("Open Module 04", key="mod4_btn", help="Click to open Interview Prep Bot"):
+            if FIREBASE_ON and st.session_state.username:
+                save_module_visit(st.session_state.username, "Interview Prep Bot")
             st.session_state.stage = "interview_prep"
             st.rerun()
 
@@ -1072,6 +1082,8 @@ def show_dashboard():
     _, mid, _ = st.columns([3, 1, 3])
     with mid:
         if st.button("🚪  Logout"):
+            if FIREBASE_ON and st.session_state.username:
+                save_logout(st.session_state.username)
             st.session_state.stage    = "login"
             st.session_state.username = ""
             st.rerun()
