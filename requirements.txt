@@ -1,6 +1,5 @@
-streamlit
-firebase-admin
-scikit-learn
-numpy
-pandas
-pickle5
+streamlit==1.35.0
+firebase-admin==6.5.0
+scikit-learn==1.4.2
+numpy==1.26.4
+pandas==2.2.2
