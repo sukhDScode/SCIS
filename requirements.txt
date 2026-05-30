@@ -1,0 +1,6 @@
+streamlit
+firebase-admin
+scikit-learn
+numpy
+pandas
+pickle5
